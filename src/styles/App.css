@@ -1,0 +1,87 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+  /*width: 80%;*/
+  /*margin: 0 auto*/
+}
+
+.App-intro {
+  font-size: large;
+}
+
+.contents {
+  height: 450px;
+  /*background-color: #123;*/
+  text-align: center;
+}
+
+.photo {
+  margin-top: 10px;
+  border: 1px solid black;
+  height: 380px;
+  line-height: 380px;
+  background-color: #fff;
+  text-align: center;
+  display: block
+}
+
+.select-photo{
+  margin-top: 15px;
+  text-align: center;
+}
+
+.col-centered {
+  display: table;
+  margin: auto;
+}
+
+.dropzone {
+  border: 1px solid black;
+  border-radius: 2px;
+  width: 120px;
+  height: 40px;
+  line-height: 40px;
+  background-color: #fff;
+  margin: auto;
+}
+
+.dropzone > a:link {
+  cursor: pointer;
+  color: #337ab7;
+  background-color: transparent;
+  text-decoration: none;
+}
+.dropzone > a:visited {
+  cursor: pointer;
+  color: #337ab7;
+  background-color: transparent;
+  text-decoration: none;
+}
+.dropzone > a:hover {
+  cursor: pointer;
+  color: #337ab7;
+  background-color: transparent;
+  text-decoration: none;
+}
+.dropzone > a:active {
+  cursor: pointer;
+  color: #337ab7;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
