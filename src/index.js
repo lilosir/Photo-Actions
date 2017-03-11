@@ -7,26 +7,54 @@ import { createStore } from 'redux';
 
 const InitialState = {
 	appliedActions: {
-		scale: true
+		Scale: false,
+		Rotate: false,
+		Translate: false,
+		Opacity: false,
+		
 	},
 	availabledActions: {
-		
+		Scale: true,
+		Rotate: true,
+		Translate: true,
+		Opacity: true,
 	}
 }
 //reducer
-function myReducer(state = InitialState, action) {
+function myReducer(originalState = InitialState, action) {
 
 	let type = action.type;
 	let property = action.property;
+	let id = action.id;
+
+	let state = Object.assign({}, originalState);
+
 	switch(type) {
 		case 'push':
-			return Object.assign(state, {
-				property: true
-			});
-		case 'remove':
-			return delete state.property;
-		case 'reset': 
-			return state = {};
+			if(id === 'appliedActions') {
+				state.appliedActions[property] = true;
+				state.availabledActions[property] = false;
+			} else {
+				state.appliedActions[property] = false;
+				state.availabledActions[property] = true;
+			}
+			return state;
+		case 'reset':
+			return {
+				appliedActions: {
+					Scale: false,
+					Rotate: false,
+					Translate: false,
+					Opacity: false,
+					
+				},
+				availabledActions: {
+					Scale: true,
+					Rotate: true,
+					Translate: true,
+					Opacity: true,
+				}
+			};
 		default: 
 			return state;
 	}

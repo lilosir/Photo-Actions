@@ -11,21 +11,12 @@ import {connect} from 'react-redux';
 class App extends Component {
 
   constructor(props){
-    super(props);
+    super(props);    
+
     this.state = {
       photoURL: null,
-      appliedActions: [
-        { id: 4, text: 'Scale'}
-      ],
-      availabledActions: [
-        { id: 1, text: 'Rotate'},
-        { id: 2, text: 'Translate'}, 
-        { id: 3, text: 'Opacity'}
-      ]
     };
-    this.onDrop = this.onDrop.bind(this)
-    this.onActionApplied = this.onActionApplied.bind(this)
-    this.onActionAvailable = this.onActionAvailable.bind(this)
+    this.onDrop = this.onDrop.bind(this);
   }
 
   onDrop(files) {
@@ -34,88 +25,89 @@ class App extends Component {
     });
   }
 
-  componentDidMount() {
-    console.log("redux: ", this.props.properties)
-  }
-
-  onActionApplied(newState) {
-    // console.log("onActionApplied", newState.cards)
-  //   this.setState({
-  //     availabledActions: newState.cards
-  //   })
-    this.setState(update(this.state, {
-      appliedActions: {
-        $set: newState.cards
+  applyStyles(properties) {
+    // console.log("props: ", properties)
+    let photoStyle = {};
+    
+    for(let key in properties){
+      if(properties[key]) {
+        if(key === "Rotate") {
+          if(photoStyle.transform){
+            photoStyle.transform += ' rotate(45deg)';
+          } else {
+            Object.assign(photoStyle,
+            {
+              transform: 'rotate(45deg)'
+            });
+          }
+        }
+        if(key === "Opacity") {
+          Object.assign(photoStyle,
+          {
+            opacity: '0.5'
+          });
+        }
+        if(key === "Scale") {
+          if(photoStyle.transform){
+            photoStyle.transform += ' scale(0.5)';
+          } else {
+            Object.assign(photoStyle,
+            {
+              transform: 'scale(0.5)'
+            });
+          }
+        }
+        if(key === "Translate") {
+          if(photoStyle.transform){
+            photoStyle.transform += ' translateX(-40px)';
+          } else {
+            Object.assign(photoStyle,
+            {
+              transform: 'translateX(-40px)'
+            });
+          }
+        }
       }
-    }))
+    }
+    return photoStyle;
   }
 
-  onActionAvailable(newState) {
-    // console.log("onActionAvailable",newState.cards);
-    // this.setState({
-    //   availabledActions: newState.cards
-    // })
-    this.setState(update(this.state, {
-      availabledActions: {
-        $set: newState.cards
+  getLists(availabledActions, appliedActions) {
+
+    let applied = [];
+    let available = [];
+    let availableCount = 0;
+
+    for(let key in availabledActions){
+      if(availabledActions[key] === true){
+        availableCount++;
+     
+        available = update(available, {
+          $push: [{id: availableCount, text: key}]
+        })
       }
-    }))
-  }
+    }
 
-  checkState() {
-    console.log(this.state.appliedActions)
+    for(let key in appliedActions){
+      if(appliedActions[key] === true){
+        availableCount++;
+        applied = update(applied, {
+          $push: [{id: availableCount, text: key}]
+        })
+      }
+    }
+    return {applied, available}
   }
 
   render() {
-    let photoStyle = this.state.appliedActions.reduce((acc, item)=> {
-      // console.log("transform_str:",transform_str)
-      if(item.text === "Rotate"){
-        if(acc.transform){
-          acc.transform += ' rotate(45deg)';
-        } else {
-          Object.assign(acc,
-          {
-            msTransform: 'rotate(45deg)', /* IE 9 */
-            WebkitTransform: 'rotate(45deg)', /* Chrome, Safari, Opera */
-            transform: 'rotate(45deg)'
-          });
-        }
-      }
-      if(item.text === "Opacity"){
-        Object.assign(acc,
-        {
-          opacity: '0.5'
-        });
-      }
-      if(item.text === "Scale"){
-        if(acc.transform){
-          acc.transform += ' scale(0.5)';
-        } else {
-          Object.assign(acc,
-          {
-            transform: 'scale(0.5)'
-          });
-        }
-      }
-      if(item.text === "Translate"){
-        if(acc.transform){
-          acc.transform += ' translateX(-40px)';
-        } else {
-          Object.assign(acc,
-          {
-            transform: 'translateX(-40px)'
-          });
-        }
-      }
-
-      return acc;
-    }, {})
-
-    // console.log("123",photoStyle)
+    
+    let photoStyle = this.applyStyles(this.props.properties.appliedActions);
+    let appliedList = this.getLists(this.props.properties.availabledActions,this.props.properties.appliedActions).applied;
+    let availableList = this.getLists(this.props.properties.availabledActions,this.props.properties.appliedActions).available;
 
     let PhotoArea = null;
     PhotoArea =  this.state.photoURL !== null ? 
-      <img src={this.state.photoURL.preview} width="200" height="200" style={photoStyle} onChange={(e)=>this.handleImageChange(e).bind(this)}/> : 
+      <img src={this.state.photoURL.preview} width="200" height="200" style={photoStyle}/> : 
       <h1> Select a photo </h1>
     return (
       <div className="container">
@@ -134,19 +126,18 @@ class App extends Component {
               <Dropzone className="dropzone" ref="dropzone" onDrop={this.onDrop} >
                 <a>Choose a image</a>
               </Dropzone>
-              {/*<button className="btn btn-default" onClick={this.checkState.bind(this)}></button>*/}
             </div>
           </div>
           <div className="col-md-4">
             <div className="col-centered">
               <h1>Available Actions</h1>
-              <ActionBox applyCallback={this.onActionAvailable} id={1} actionList={this.state.availabledActions}/>
+              <ActionBox ref='availabledActions' id={'availabledActions'} actionList={availableList}/>
             </div>
           </div>
           <div className="col-md-4">
             <div className="col-centered">
               <h1>Applied Actions</h1>
-              <ActionBox applyCallback={this.onActionApplied} id={2} actionList={this.state.appliedActions}/>
+              <ActionBox id={"appliedActions"} actionList={appliedList}/>
             </div>
           </div>
         </div>
@@ -158,11 +149,19 @@ class App extends Component {
 App = DragDropContext(HTML5Backend)(App);
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(App);
 
 function mapStateToProps(state) {
   return {
     properties: state
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    reset: ()=> {
+      dispatch({type:'reset'})
+    },
   }
 }

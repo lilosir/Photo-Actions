@@ -24,11 +24,10 @@ class ActionBox extends Component {
         $push: [ card ]
       }
     }));
-    this.props.applyCallback(this.state);
-    // console.log("state",this.state);
+    this.props.pushCard(this.props.id, card.text);
   }
  
-  removeCard(index) {   
+  removeCard(index) {
     this.setState(update(this.state, {
       cards: {
         $splice: [
@@ -36,8 +35,6 @@ class ActionBox extends Component {
         ]
       }
     }));
-    this.props.applyCallback(this.state);
-    // console.log("state",this.state);
   }
 
   moveCard(dragIndex, hoverIndex) {
@@ -52,16 +49,6 @@ class ActionBox extends Component {
         ],
       },
     }));
-    console.log("state",this.state);
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-    // console.log("state",this.state);
-    // console.log("nextState",nextState);
-    // if(nextState !== this.state){
-    //   console.log(this.props.id+" changed")
-    // }
-    // this.props.getActions(this.state.cards);
   }
 
   render() {
@@ -86,6 +73,7 @@ class ActionBox extends Component {
             listId={this.props.id}
             moveCard={this.moveCard}
             removeCard={this.removeCard}
+            pushCard={this.pushCard}
           />
         ))}
       </div>
@@ -104,27 +92,27 @@ const cardTarget = {
   }
 }
 
-// export default DragDropContext(HTML5Backend)(ActionBox);
-
-export default DropTarget("CARD", cardTarget, (connect, monitor) => ({
+ActionBox = DropTarget("CARD", cardTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   canDrop: monitor.canDrop()
 }))(ActionBox);
 
-// export default connect(
-//   mapStateToProps,
-//   mapDispatchToProps,
-// )(ActionBox);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ActionBox);
 
-// function mapStateToProps(state) {
-//   return {
-//     properties: state
-//   }
-// }
+function mapStateToProps(state) {
+  return {
+    properties: state
+  }
+}
 
-// function mapDispatchToProps(dispatch) {
-//   return {
-    
-//   }
-// }
+function mapDispatchToProps(dispatch) {
+  return {
+    pushCard: (id, text)=> {
+      dispatch({type:'push', id: id, property: text})
+    },
+  }
+}
